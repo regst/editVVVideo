@@ -24,6 +24,6 @@
         </activity>
 
 
-        <activity android:name=".EsayVideoEditActivity" />
+        <activity android:name="com.ztq.ry.EsayVideoEditActivity" />
     </application>
 </manifest>

@@ -14,15 +14,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.yanzhenjie.album.Action;
 import com.yanzhenjie.album.Album;
 import com.yanzhenjie.album.AlbumFile;
-import com.yanzhenjie.album.api.widget.Widget;
-import com.zhihu.matisse.Matisse;
-import com.zhihu.matisse.MimeType;
-import com.zhihu.matisse.engine.impl.PicassoEngine;
-import com.zhihu.matisse.filter.Filter;
 
-import java.io.File;
+import com.zhihu.matisse.Matisse;
+
+import com.ztq.ry.EsayVideoEditActivity;
+
+
 import java.util.ArrayList;
-import java.util.logging.Logger;
+
 
 public class MainActivity extends AppCompatActivity {
     String video;

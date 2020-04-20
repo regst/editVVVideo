@@ -1,7 +1,7 @@
-package com.kui.wxvideoeditt;
+package com.ztq.ry;
+
 import android.os.Bundle;
 import android.os.Environment;
-
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -20,9 +20,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+ ;
 
 import static android.os.Environment.getExternalStorageDirectory;
 
@@ -36,13 +34,9 @@ public class EsayVideoEditActivity extends AppCompatActivity implements RangeBar
 
     public static final String PATH = "path";
     private final int IMAGE_NUM=60;//每一屏图片的数量
-    @BindView(R.id.recyclerview)
     RecyclerView recyclerview;
-    @BindView(R.id.rangeBar)
     RangeBar rangeBar;
-    @BindView(R.id.fram)
     FrameLayout fram;
-    @BindView(R.id.uVideoView)
     VideoView uVideoView;
     private String videoPath;
     private String parentPath;
@@ -65,7 +59,16 @@ public class EsayVideoEditActivity extends AppCompatActivity implements RangeBar
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_video);
-        ButterKnife.bind(this);
+
+
+        recyclerview=findViewById(R.id.recyclerview);
+        rangeBar=findViewById(R.id.rangeBar);
+        fram=findViewById(R.id.fram);
+        uVideoView=findViewById(R.id.uVideoView);
+
+
+
+
         videoPath = getIntent().getStringExtra(PATH);
         Log.e("onCreate","videoPath:"+videoPath);
         if (!new File(videoPath).exists()) {
