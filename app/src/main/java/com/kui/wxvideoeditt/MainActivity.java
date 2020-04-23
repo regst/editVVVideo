@@ -4,33 +4,51 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.esay.ffmtool.FfmpegTool;
 import com.yanzhenjie.album.Action;
 import com.yanzhenjie.album.Album;
 import com.yanzhenjie.album.AlbumFile;
 
+import com.yanzhenjie.album.util.AlbumUtils;
 import com.zhihu.matisse.Matisse;
 
 import com.ztq.ry.EsayVideoEditActivity;
 
 
+import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 
 public class MainActivity extends AppCompatActivity {
     String video;
+    TextView tv_lasd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        tv_lasd = findViewById(R.id.tv_lasd);
         video = "/storage/emulated/0/DCIM/pipixia/ac578bd1e04a457b8208cd2e560c41a4.mp4";
+        myHandler = new MyHandler(this);
+        Message message = new Message();
+        message.what = 1;
+        message.obj = "asdljk;f";
+        myHandler.sendMessage(message);
+
 
     }
 
@@ -69,10 +87,43 @@ public class MainActivity extends AppCompatActivity {
                             Log.e("result", "getLatitude=" + result.get(i).getLatitude());
                             Log.e("result", "getLongitude=" + result.get(i).getLongitude());
                             Log.e("result", "getMediaType=" + result.get(i).getMediaType());
-                            Intent intent = new Intent();
-                            intent.putExtra(EsayVideoEditActivity.PATH, result.get(i).getPath());
-                            intent.setClass(MainActivity.this, EsayVideoEditActivity.class);
-                            startActivity(intent);
+                            Log.e("result", "getSize=" + result.get(i).getSize());
+
+                            if (result.get(i).getDuration() / 1000 > 60) {
+                                Intent intent = new Intent();
+                                intent.putExtra(EsayVideoEditActivity.PATH, result.get(i).getPath());
+                                intent.setClass(MainActivity.this, EsayVideoEditActivity.class);
+                                startActivity(intent);
+                            } else {
+                                final String string = result.get(i).getPath();
+                                ExecutorService executorService = Executors.newFixedThreadPool(1);
+                                executorService.execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        String path = Environment.getExternalStorageDirectory().getAbsolutePath()
+                                                + File.separator + "ztq" + File.separator + "compress";
+                                        File file1 = new File(path);
+                                        if (!file1.exists()) {
+                                            file1.mkdirs();
+                                        }
+                                        FfmpegTool ffmpegTool = FfmpegTool.getInstance(MainActivity.this);
+                                        ffmpegTool.compressVideo(string, path + File.separator, 3, new FfmpegTool.VideoResult() {
+                                            @Override
+                                            public void clipResult(int i, String s, String s1, boolean b, int i1) {
+                                                String result = "压缩完成";
+                                                if (!b) {
+                                                    result = "压缩失败";
+                                                }
+                                                Log.i("click2", "s:" + s);//压缩前的视频
+                                                Log.i("click2", "s1:" + s1);//压缩后的视频
+                                                Toast.makeText(MainActivity.this, result + "sdafasfa", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+                                });
+
+                            }
+
 
                         }
 
@@ -99,6 +150,28 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, EsayVideoEditActivity.class);
             intent.putExtra(EsayVideoEditActivity.PATH, Matisse.obtainPathResult(data).get(0));
             startActivity(intent);
+        }
+    }
+
+    private MyHandler myHandler;
+
+    private static class MyHandler extends Handler {
+        private WeakReference<MainActivity> weakReference;
+
+        public MyHandler(MainActivity activity) {
+            weakReference = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 1:
+                    Log.e("---------", "---------" + msg.obj);
+                    weakReference.get().tv_lasd.setText(msg.obj + "");
+                    break;
+            }
+            super.handleMessage(msg);
+
         }
     }
 }

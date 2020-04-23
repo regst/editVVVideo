@@ -77,9 +77,9 @@ public class EsayVideoEditActivity extends AppCompatActivity implements RangeBar
         }
         String str="temp"+ System.currentTimeMillis()/1000;
         parentPath= getExternalStorageDirectory().getAbsolutePath()
-                + File.separator+"test"+ File.separator+str+ File.separator;
+                + File.separator+"hemg"+ File.separator+str+ File.separator;
         videoResutlDir= getExternalStorageDirectory().getAbsolutePath()
-                + File.separator+"test"+ File.separator+"clicp";
+                + File.separator+"hemg"+ File.separator+"clicp";
         File file=new File(parentPath);
         if(!file.exists()){
             file.mkdirs();
@@ -121,7 +121,7 @@ public class EsayVideoEditActivity extends AppCompatActivity implements RangeBar
         if (!parent.exists()){
             parent.mkdirs();
         }
-        Toast.makeText(this,"第一次解码中，先解码两屏的图片", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this,"第一次解码中，先解码两屏的图片", Toast.LENGTH_SHORT).show();
         runImagDecodTask(0,2 * IMAGE_NUM);
     }
 
@@ -138,7 +138,7 @@ public class EsayVideoEditActivity extends AppCompatActivity implements RangeBar
                 public void run() {
                     //压缩后视频的保存路径
                     String path= Environment.getExternalStorageDirectory().getAbsolutePath()
-                            + File.separator+"test"+ File.separator+"compress";
+                            + File.separator+"hemg"+ File.separator+"compress";
                     File file1=new File(path);
                     if (!file1.exists()){
                         file1.mkdirs();
@@ -152,6 +152,8 @@ public class EsayVideoEditActivity extends AppCompatActivity implements RangeBar
                             }
                             Log.i("click2","s:"+s);//压缩前的视频
                             Log.i("click2","s1:"+s1);//压缩后的视频
+                            Log.i("i1","i1:"+i1);//压缩后的视频
+                            Log.i("i","i:"+i);//压缩后的视频
                             Toast.makeText(EsayVideoEditActivity.this,result, Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -187,7 +189,38 @@ public class EsayVideoEditActivity extends AppCompatActivity implements RangeBar
                             re="裁剪视频失败";
                         }
                         videoResutl=s1;
-                        Toast.makeText(EsayVideoEditActivity.this,re, Toast.LENGTH_LONG).show();
+                        File file=new File(videoResutl);
+                        if (file.exists()){
+                            Toast.makeText(EsayVideoEditActivity.this,"开始压缩，过程可能比较漫长", Toast.LENGTH_SHORT).show();
+                            executorService.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //压缩后视频的保存路径
+                                    String path= Environment.getExternalStorageDirectory().getAbsolutePath()
+                                            + File.separator+"hemg"+ File.separator+"compress";
+                                    File file1=new File(path);
+                                    if (!file1.exists()){
+                                        file1.mkdirs();
+                                    }
+                                    ffmpegTool.compressVideo(videoResutl, path+ File.separator, 3, new FfmpegTool.VideoResult() {
+                                        @Override
+                                        public void clipResult(int i, String s, String s1, boolean b, int i1) {
+                                            String result="压缩完成";
+                                            if (!b){
+                                                result="压缩失败";
+                                            }
+                                            Log.i("click2","s:"+s);//压缩前的视频
+                                            Log.i("click2","s1:"+s1);//压缩后的视频
+                                            Log.i("i1","i1:"+i1);//压缩后的视频
+                                            Log.i("i","i:"+i);//压缩后的视频
+                                            Toast.makeText(EsayVideoEditActivity.this,result, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            });
+                        }else {
+                            Toast.makeText(EsayVideoEditActivity.this,"未找到裁剪后的视频", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
             }
@@ -297,6 +330,7 @@ public class EsayVideoEditActivity extends AppCompatActivity implements RangeBar
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         uVideoView.stopPlayback();
         //最后不要忘了删除这个临时文件夹 parentPath
         //不然时间长了会在手机上生成大量不用的图片，该activity销毁后这个文件夹就用不到了

@@ -45,7 +45,7 @@
                 android:id="@+id/rangeBar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:tickCount="60"
+                app:tickCount="61"
                 app:tickHeight="55dp" />
 
         </FrameLayout>
